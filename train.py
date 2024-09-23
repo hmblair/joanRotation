@@ -7,8 +7,6 @@ from dataloader import QM9Dataset
 from model import SimpleEnergyModel
 from constants import NUM_ELEMENTS, ELEMENT_IX
 
-# The device we will be using for training
-device = 'cpu'
 # The path to the folder containing the QM9 dataset
 path = 'data'
 # We will not be stacking inputs into batches
@@ -18,45 +16,45 @@ num_epochs = 5
 # The learning rate used by the optimiser
 lr = 0.001
 # The dataset which will load the data from the files
-dataset = QM9Dataset(path)
+dataset = ...
 # The dataloader which allows us to loop over the files.
 dataloader = data.DataLoader(dataset, batch_size)
 
-# Initialise the model
-model = SimpleEnergyModel(NUM_ELEMENTS)
-# Move the model to the correct device
-model = model.to(device)
-# Initialise the optimiser
+# Initialise the model with NUM_ELEMENTS as the max_elements
+model = ...
+# Initialise the optimiser (We will always use Adam)
 optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
+# For counting which step we are on
 step = 0
+# For keeping track of the average loss
 loss_moving_average = 0
+# How often to print the loss
+PRINT_LOSS = 2500
+
+# The main training loop
 for epoch in range(num_epochs):
+    # Loop over the dataset
     for coordinates, atoms, energy in dataloader:
 
-        atom_ix = torch.Tensor([ELEMENT_IX[atom] for atom in atoms]).long()
-
-        # Move the inputs and outputs to the appropriate device
-        coordinates = coordinates.to(device)
-        atom_ix = atom_ix.to(device)
-        energy = energy.to(device)
-
         # Compute the predicted energy using the model
-        p_energy = model(coordinates, atom_ix)
+        p_energy = ...
 
         # Compute the loss function
-        loss = (energy - p_energy) ** 2
+        loss = ...
 
         # Compute the gradients
-        loss.backward()
+        pass
 
-        # Perform the backward step
-        optimiser.step()
+        # Use the gradients to update the weights
+        pass
 
-        # Zero the gradients
-        optimiser.zero_grad()
+        # Set the gradients back to zero
+        pass
 
+        # Print a moving average of the loss every PRINT_LOSS steps
         loss_moving_average = loss_moving_average * 0.9 + 0.1 * loss
         step += 1
-        if step % 2500 == 0:
-            print(f'Loss (moving average): {loss_moving_average.item():.3f}')
+        if step % PRINT_LOSS == 0:
+            print(
+                f'Loss (moving average; step {step}): {loss_moving_average.item():.3f}')
