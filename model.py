@@ -54,4 +54,4 @@ class SimpleEnergyModel(nn.Module):
         atom_weights = self.weights[pairwise_atom_ix]
 
         # Compute the predicted energy under the model
-        return (atom_weights * reciprocal_d).sum() + self.bias
+        return - (atom_weights * reciprocal_d).sum() + self.bias
