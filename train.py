@@ -13,6 +13,9 @@ path = 'data'
 batch_size = None
 # The number of epochs we will train for
 num_epochs = 5
+# In case we want to limit the amount of data that the model
+# sees. Set to inifinity by default.
+MAX_STEP = float('inf')
 # The learning rate used by the optimiser
 lr = 0.001
 # The dataset which will load the data from the files
@@ -25,8 +28,6 @@ model = ...
 # Initialise the optimiser (We will always use Adam)
 optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
-# For counting which step we are on
-step = 0
 # For keeping track of the average loss
 loss_moving_average = 0
 # How often to print the loss
@@ -34,6 +35,8 @@ PRINT_LOSS = 2500
 
 # The main training loop
 for epoch in range(num_epochs):
+    # For counting which step we are on
+    step = 0
     # Loop over the dataset
     for coordinates, atoms, energy in dataloader:
 
@@ -57,4 +60,9 @@ for epoch in range(num_epochs):
         step += 1
         if step % PRINT_LOSS == 0:
             print(
-                f'Loss (moving average; step {step}): {loss_moving_average.item():.3f}')
+                f'Loss (moving average; step {step}): {loss_moving_average.item():.3f}'
+            )
+
+        # If we have reached the maximum step, move on to the next epoch.
+        if step > MAX_STEP:
+            break
