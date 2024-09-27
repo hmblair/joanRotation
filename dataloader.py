@@ -4,6 +4,7 @@ from parse import parse_xyz
 import torch
 from torch.utils import data
 import os
+from constants import ELEMENT_IX
 
 
 class QM9Dataset(data.Dataset):
@@ -37,7 +38,9 @@ class QM9Dataset(data.Dataset):
         # Convert the coordinates to a PyTorch tensor
         coordinates = torch.from_numpy(coordinates)
         # Convert the elements into integers
-        pass
+        elements = [ELEMENT_IX[element] for element in elements]
+        # Convert the elements to a PyTorch tensor
+        elements = torch.tensor(elements) 
         # Convert the energy to a PyTorch tensor
         energy = torch.tensor(energy)
 
