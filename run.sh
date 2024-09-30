@@ -7,7 +7,8 @@
 #SBATCH --mem=32G
 
 ml load python/3.12.1
-
 pip install -r requirements.txt
 
-...
+export WANDB_API_KEY=...
+
+python3 train.py
