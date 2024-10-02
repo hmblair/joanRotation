@@ -21,6 +21,7 @@ class EpochTimer:
         """
         Finish timing the code.
         """
+        self.end.record()
         torch.cuda.synchronize()
         t = self.start.elapsed_time(self.end)
         return t / 1000
