@@ -11,6 +11,7 @@ class FeedforwardLayer(nn.Module):
         out_size,
         activation: bool = True,
     ) -> None:
+        super().__init__()
 
         self.linear = nn.Linear(
             in_size,
@@ -36,10 +37,18 @@ class FeedforwardNetwork(nn.Module):
         self,
         dimensions: list[int],
     ) -> None:
+        super().__init__()
 
         # Initialise the layers using the provided dimensions
         # Use no activation for the final layer.
         layers = []
+        for i in range(len(dimensions) - 2):
+            layers.append(
+                FeedforwardLayer(dimensions[i], dimensions[i+1], True)
+            )
+        layers.append(
+            FeedforwardLayer(dimensions[-2], dimensions[-1], False)
+        )
 
         self.layers = nn.ModuleList(layers)
 
@@ -47,14 +56,8 @@ class FeedforwardNetwork(nn.Module):
         self,
         x: torch.Tensor,
     ) -> torch.Tensor:
-
         # Apply the layers in the order they are given in the list.
-        pass
 
-
-# Initialise an instance of a FeedforwardNetwork using the given dimensions
-dimensions = [3, 10, 10, 3]
-network = ...
-
-# Pass the given input to the network.
-x = torch.randn(3)
+        for layer in self.layers:
+            x = layer(x)
+        return x
