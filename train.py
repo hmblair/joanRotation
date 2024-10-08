@@ -8,6 +8,10 @@ from model import SimpleEnergyModel
 from constants import NUM_ELEMENTS, ELEMENT_IX
 import wandb
 from tqdm import tqdm
+from timer import EpochTimer
+from time import time
+
+#device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 # Log in to W&B
 wandb.login()
@@ -25,7 +29,7 @@ test_path = 'test'
 # We will not be stacking inputs into batches
 batch_size = None
 # The number of epochs we will train for
-num_epochs = 5
+num_epochs = 25
 # In case we want to limit the amount of data that the model
 # sees. Set to inifinity by default.
 MAX_STEP = float('inf')
@@ -34,6 +38,7 @@ lr = 0.001
 # The datasets which will load the data from the files
 train_dataset = QM9Dataset(train_path)
 val_dataset = QM9Dataset(val_path)
+
 # The dataloaders which allows us to loop over the files.
 train_dataloader = data.DataLoader(train_dataset, batch_size)
 val_dataloader = data.DataLoader(val_dataset, batch_size)
@@ -52,14 +57,19 @@ PRINT_LOSS = 1_000
 # The main training loop
 for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
 
+    # start gpu timer
+    #timer = EpochTimer()
+    time1 = time() #call cpu time
+
     # For counting which step we are on
     step = 0
 
     # First, we do the training loop
-    for coordinates, atoms, energy in train_dataloader:
+    for coordinates, atoms, energy in train_dataloader: 
 
         # Compute the predicted energy using the model
         p_energy = model(coordinates, atoms)
+        #p_energy.to(device)
 
         # Compute the loss function
         loss = (p_energy - energy) ** 2
@@ -100,3 +110,10 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
         step += 1
         if step % PRINT_LOSS == 0:
             wandb.log({'Val loss': val_loss_moving_average})
+         
+    # end gpu timer
+    #epoch_time = timer.finish()
+    #print(epoch_time)
+    time2 = time() #call cpu time again
+    epoch_cpu_time = time2 - time1
+    print (epoch_cpu_time)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 
+#device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 COULOMB_CONSTANT = -2.31E5
 
@@ -23,7 +24,7 @@ class SimpleEnergyModel(nn.Module):
         bias: bool = True,
     ) -> None:
         super().__init__()
-
+        
         # Initialise the weights of the model to be random
         self.weights = torch.nn.Parameter(
             torch.randn(max_element * (max_element+1) // 2),
@@ -36,6 +37,7 @@ class SimpleEnergyModel(nn.Module):
             )
         else:
             self.bias = torch.tensor(0)
+        #self.bias.to(device)
 
     def forward(
         self: SimpleEnergyModel,
@@ -45,16 +47,23 @@ class SimpleEnergyModel(nn.Module):
         """
         Compute the energy for the input configuartion of atoms.
         """
-
+        # move tensor to GPU
+        #coordinates.to(device)
+        #atom_ix.to(device) 
+        
         # Compute the reciprocal pairwise distances, and
         # set the nan's (along the diagonal) to 0
-        d = torch.norm(coordinates[None, :] - coordinates[:, None])
+        d = torch.norm(coordinates[None, :] - coordinates[:, None])       
         reciprocal_d = torch.nan_to_num(1/d, 0.0)
+        #reciprocal_d.to(device) 
 
         # Map each pair of elements to a unique weight
         pairwise_atom_ix = atom_ix[:,  None] * \
             (atom_ix[:, None] + 1) // 2 + atom_ix[None, :]
-        atom_weights = self.weights[pairwise_atom_ix]
+        #pairwise_atom_ix.to(device)
 
+        atom_weights = self.weights[pairwise_atom_ix]
+        #atom_weights.to(device)
+                       
         # Compute the predicted energy under the model
         return COULOMB_CONSTANT * (atom_weights * reciprocal_d).sum() + self.bias
