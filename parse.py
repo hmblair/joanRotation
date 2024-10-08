@@ -24,6 +24,8 @@ def parse_xyz(filename: str) -> tuple[np.ndarray, list[str], float]:
     num_atoms = 0
     elements = []
     coordinates = []
+    charges = []
+    harmonic_vibrational_frequencies = []
     with open(filename, 'r') as f:
         for line_num, line in enumerate(f):
             if line_num == 0:
@@ -37,7 +39,10 @@ def parse_xyz(filename: str) -> tuple[np.ndarray, list[str], float]:
                 coordinates.append(
                     [parse_float(x), parse_float(y), parse_float(z)]
                 )
+                charges.append(parse_float(charge))
+            elif line_num == num_atoms + 2:
+                harmonic_vibrational_frequencies = [float(i) for i in line.split()]
 
     coordinates = np.array(coordinates)
 
-    return coordinates, elements, energy
+    return coordinates, elements, energy, charges, harmonic_vibrational_frequencies
