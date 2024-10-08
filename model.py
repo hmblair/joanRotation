@@ -28,7 +28,7 @@ class SimpleEnergyModel(nn.Module):
         super().__init__()
 
         # Get the sizes of the network
-        sizes = [3] + hidden_sizes + [3]
+        sizes = [2] + hidden_sizes + [3]
         # Initialise the network
         self.network = FeedforwardNetwork(sizes)
         # Initialise a 1-dimensional embedding
@@ -48,7 +48,6 @@ class SimpleEnergyModel(nn.Module):
         coordinates: torch.Tensor,
         atom_ix: torch.Tensor,
         charges: torch.Tensor,
-        frequencies: torch.Tensor
     ) -> torch.Tensor:
         """
         Compute the energy for the input configuartion of atoms.
@@ -67,11 +66,9 @@ class SimpleEnergyModel(nn.Module):
         pairwise_atom_emb = self.embedding(pairwise_atom_ix).squeeze(-1)
         # Get the pairwise product of the charges
         pairwise_charges = charges[:, None] * charges[None, :]
-        # Get the pairwise sum of the frequencies
-        frequencies = frequencies[:, None] + frequencies[None, :]
 
         model_inputs = torch.stack(
-            [pairwise_atom_emb, pairwise_charges, frequencies],
+            [pairwise_atom_emb, pairwise_charges],
             dim=-1,
         )
 
