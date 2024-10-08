@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 from feedforward import FeedforwardNetwork
 
-#device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 COULOMB_CONSTANT = -1
 HARTREE_CONSTANT = 0.0367
@@ -27,22 +26,6 @@ class SimpleEnergyModel(nn.Module):
         hidden_sizes: list[int]
     ) -> None:
         super().__init__()
-<<<<<<< HEAD
-        
-        # Initialise the weights of the model to be random
-        self.weights = torch.nn.Parameter(
-            torch.randn(max_element * (max_element+1) // 2),
-            requires_grad=True
-        )
-        if bias:
-            self.bias = torch.nn.Parameter(
-                torch.randn(1),
-                requires_grad=True
-            )
-        else:
-            self.bias = torch.tensor(0)
-        #self.bias.to(device)
-=======
 
         # Get the sizes of the network
         sizes = [3] + hidden_sizes + [3]
@@ -59,7 +42,6 @@ class SimpleEnergyModel(nn.Module):
             torch.randn(1),
             requires_grad=True,
         )
->>>>>>> 62a1575a6adc67709bb119596f760e98abfdef29
 
     def forward(
         self: SimpleEnergyModel,
@@ -71,35 +53,17 @@ class SimpleEnergyModel(nn.Module):
         """
         Compute the energy for the input configuartion of atoms.
         """
-        # move tensor to GPU
-        #coordinates.to(device)
-        #atom_ix.to(device) 
-        
+
         # Compute the reciprocal pairwise distances, and
         # set the nan's (along the diagonal) to 0
-<<<<<<< HEAD
-        d = torch.norm(coordinates[None, :] - coordinates[:, None])       
-        reciprocal_d = torch.nan_to_num(1/d, 0.0)
-        #reciprocal_d.to(device) 
-=======
         d = torch.norm(coordinates[None, :] - coordinates[:, None], dim=-1)
         reciprocal_d = torch.nan_to_num(1/d, 0.0)
         # Limit the distance to 0.1 A
         reciprocal_d[reciprocal_d > 10] = 10
->>>>>>> 62a1575a6adc67709bb119596f760e98abfdef29
 
         # Map each pair of elements to a unique weight
         pairwise_atom_ix = atom_ix[:,  None] * \
             (atom_ix[:, None] + 1) // 2 + atom_ix[None, :]
-<<<<<<< HEAD
-        #pairwise_atom_ix.to(device)
-
-        atom_weights = self.weights[pairwise_atom_ix]
-        #atom_weights.to(device)
-                       
-        # Compute the predicted energy under the model
-        return COULOMB_CONSTANT * (atom_weights * reciprocal_d).sum() + self.bias
-=======
         pairwise_atom_emb = self.embedding(pairwise_atom_ix).squeeze(-1)
         # Get the pairwise product of the charges
         pairwise_charges = charges[:, None] * charges[None, :]
@@ -128,4 +92,3 @@ class SimpleEnergyModel(nn.Module):
         # Return the sum of the two model predictions
         # and the bias
         return c_energy + lj_energy + self.bias
->>>>>>> 62a1575a6adc67709bb119596f760e98abfdef29
