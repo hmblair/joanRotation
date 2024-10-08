@@ -44,7 +44,7 @@ train_dataloader = data.DataLoader(train_dataset, batch_size)
 val_dataloader = data.DataLoader(val_dataset, batch_size)
 
 # Initialise the model with NUM_ELEMENTS as the max_elements
-model = SimpleEnergyModel(NUM_ELEMENTS)
+model = SimpleEnergyModel(NUM_ELEMENTS, [])
 # Initialise the optimiser (We will always use Adam)
 optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
@@ -65,10 +65,10 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
     step = 0
 
     # First, we do the training loop
-    for coordinates, atoms, energy in train_dataloader: 
+    for coordinates, atoms, energy, charges, frequencies in train_dataloader: 
 
         # Compute the predicted energy using the model
-        p_energy = model(coordinates, atoms)
+        p_energy = model(coordinates, atoms, charges, frequencies)
         #p_energy.to(device)
 
         # Compute the loss function
@@ -94,10 +94,10 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
             break
 
     # Next, we do the validation loop
-    for coordinates, atoms, energy in val_dataloader:
+    for coordinates, atoms, energy, charges, frequencies in val_dataloader:
 
         # Compute the predicted energy using the model
-        p_energy = model(coordinates, atoms)
+        p_energy = model(coordinates, atoms, charges, frequencies)
 
         # Compute the loss function
         loss = (p_energy - energy) ** 2
