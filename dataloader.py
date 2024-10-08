@@ -58,7 +58,7 @@ class QM9Dataset(data.Dataset):
         # Get the path that this index corresponds to
         path = self.paths[ix]
         # Load the coordinates and elements of the atom
-        coordinates, elements, energy = parse_xyz(path)
+        coordinates, elements, energy, charges, harmonic_vibrational_frequencies = parse_xyz(path)
         # Convert the coordinates to a PyTorch tensor
         coordinates = torch.from_numpy(coordinates)
         # Convert the elements into integers
@@ -67,18 +67,24 @@ class QM9Dataset(data.Dataset):
         elements = torch.tensor(elements) 
         # Convert the energy to a PyTorch tensor
         energy = torch.tensor(energy)
+        # Convert the charges to a PyTorch tensor
+        charges = torch.tensor(charges)
+        # Convert the frequencies to a PyTorch tensor
+        harmonic_vibrational_frequencies = torch.tensor(harmonic_vibrational_frequencies)
 
         # Convert the coordinates and energies to
         # standard floats
         coordinates = coordinates.to(torch.float32)
         energy = energy.to(torch.float32)
-        
+        charges = charges.to(torch.float32)
+        harmonic_vibrational_frequencies = harmonic_vibrational_frequencies.to(torch.float32)
+
         # move tensor to GPU
         #coordinates.to(device)
         #elements.to(device)
         #energy.to(device)
 
-        return coordinates, elements, energy
+        return coordinates, elements, energy, charges, harmonic_vibrational_frequencies
 
     def __len__(
         self: QM9Dataset,
