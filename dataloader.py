@@ -5,6 +5,7 @@ import torch
 from torch.utils import data
 import os
 from constants import ELEMENT_IX
+import random
 
 ELEMENT_IX = {
     "H": 1,
@@ -92,6 +93,14 @@ class QM9Dataset(data.Dataset):
 
         return len(self.paths)
 
+    def __shuffle__(
+        self: QM9Dataset,
+    ) -> list:
+        """
+        shuffle the data/list of paths
+        """
+        return random.shuffle(self.paths)
+ 
 #dataset = QM9Dataset('QM9_data')
 #coordinates, elements, energy = dataset[0]
 #print(coordinates, elements, energy, len(dataset))
