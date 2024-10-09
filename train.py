@@ -10,8 +10,12 @@ import wandb
 from tqdm import tqdm
 from timer import EpochTimer
 from time import time
+import psutil
 
 #device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+
+#CPU memory_usage
+process = psutil.Process()
 
 # Log in to W&B
 wandb.login()
@@ -88,11 +92,13 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
         step += 1
         if step % PRINT_LOSS == 0:
             wandb.log({'Train loss': train_loss_moving_average})
+            wandb.log({'Memory usage':process.memory_info().rss}) 
 
         # If we have reached the maximum step, move on to the next epoch.
         if step > MAX_STEP:
             break
-
+         
+    train_dataset.shuffle()
     # Next, we do the validation loop
     for coordinates, atoms, energy, charges in val_dataloader:
 
@@ -110,8 +116,9 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
         step += 1
         if step % PRINT_LOSS == 0:
             wandb.log({'Val loss': val_loss_moving_average})
-         
-    # end gpu timer
+            wandb.log({'Memory usage': process.memory_info().rss})
+    
+# end gpu timer
     #epoch_time = timer.finish()
     #print(epoch_time)
     time2 = time() #call cpu time again
