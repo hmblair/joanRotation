@@ -65,10 +65,10 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
     step = 0
 
     # First, we do the training loop
-    for coordinates, atoms, energy, charges, frequencies in train_dataloader: 
+    for coordinates, atoms, energy, charges in train_dataloader: 
 
         # Compute the predicted energy using the model
-        p_energy = model(coordinates, atoms, charges, frequencies)
+        p_energy = model(coordinates, atoms, charges)
         #p_energy.to(device)
 
         # Compute the loss function
@@ -94,10 +94,10 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
             break
 
     # Next, we do the validation loop
-    for coordinates, atoms, energy, charges, frequencies in val_dataloader:
+    for coordinates, atoms, energy, charges in val_dataloader:
 
         # Compute the predicted energy using the model
-        p_energy = model(coordinates, atoms, charges, frequencies)
+        p_energy = model(coordinates, atoms, charges)
 
         # Compute the loss function
         loss = (p_energy - energy) ** 2
