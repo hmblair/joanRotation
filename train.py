@@ -98,7 +98,7 @@ for epoch in tqdm(range(num_epochs), desc='Current Epoch:'):
         if step > MAX_STEP:
             break
          
-    train_dataset.__shuffle__()
+    train_dataset.shuffle()
     # Next, we do the validation loop
     for coordinates, atoms, energy, charges in val_dataloader:
 
