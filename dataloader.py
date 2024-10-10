@@ -93,7 +93,7 @@ class QM9Dataset(data.Dataset):
 
         return len(self.paths)
 
-    def __shuffle__(
+    def shuffle(
         self: QM9Dataset,
     ) -> list:
         """
