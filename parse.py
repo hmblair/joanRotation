@@ -47,7 +47,7 @@ def parse_xyz(filename: str) -> tuple[np.ndarray, list[str], float]:
 
     return coordinates, elements, energy, charges
 
-def parse_pdb(filename: str) -> tensor:
+def parse_pdb(filename: str) -> torch.Tensor:
     """
     Parses bond_list from pdb files. 
     Creates 2 tensors: origin -> destination and destination -> origin (covers both directions)
@@ -62,4 +62,6 @@ def parse_pdb(filename: str) -> tensor:
         bond_destination = bond_tensor[:, 1]
         U = torch.cat((bond_origin,bond_destination))
         V = torch.cat((bond_destination,bond_origin))
-    return U, V
+        coordinates = pdb.coord
+        coordinates = torch.tensor(coordinates)
+        return U, V, coordinates

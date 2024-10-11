@@ -133,15 +133,16 @@ class pdbDataset(data.Dataset):
 
         # Get the path that this index corresponds to
         path = self.paths[ix]
-        # Parse bond tensors
-        U, V = parse_pdb(path)
+        # Parse bond tensors and coordinates
+        U, V, coordinates = parse_pdb(path)
         # Graph bonds as edges
         graph = dgl.graph((U,V))
         # Add self <-> self bonds to the graph
         graph = dgl.add_self_loop(graph)
-        return graph
+        return graph, coordinates
         
     
-#dataset = QM9Dataset('QM9_data')
+dataset = pdbDataset('pdb_data')
+print(dataset)
 #coordinates, elements, energy = dataset[0]
 #print(coordinates, elements, energy, len(dataset))
