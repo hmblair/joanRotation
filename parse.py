@@ -1,5 +1,8 @@
-
 import numpy as np
+from biotite.structure.io import load_structure
+import biotite
+import torch
+import dgl
 
 INTERNAL_ENERGY_IX = 10
 FREE_ENERGY_IX = 13
@@ -43,3 +46,20 @@ def parse_xyz(filename: str) -> tuple[np.ndarray, list[str], float]:
     coordinates = np.array(coordinates)
 
     return coordinates, elements, energy, charges
+
+def parse_pdb(filename: str) -> tensor:
+    """
+    Parses bond_list from pdb files. 
+    Creates 2 tensors: origin -> destination and destination -> origin (covers both directions)
+    """
+    with open(filename, 'r') as f:
+        pdb = load_structure(f)
+        bond_list = biotite.structure.connect_via_distances(pdb)
+        bond_array = bond_list.as_array()
+        bond_array = bond_array.astype(np.int64)
+        bond_tensor = torch.from_numpy(bond_array)
+        bond_origin = bond_tensor[:, 0]
+        bond_destination = bond_tensor[:, 1]
+        U = torch.cat((bond_origin,bond_destination))
+        V = torch.cat((bond_destination,bond_origin))
+    return U, V

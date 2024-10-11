@@ -1,11 +1,17 @@
 
 from __future__ import annotations
 from parse import parse_xyz
+from parse import parse_pdb
 import torch
 from torch.utils import data
 import os
 from constants import ELEMENT_IX
 import random
+import numpy as np
+from biotite.structure.io import load_structure
+import biotite
+import torch
+import dgl
 
 ELEMENT_IX = {
     "H": 1,
@@ -101,6 +107,41 @@ class QM9Dataset(data.Dataset):
         """
         return random.shuffle(self.paths)
  
+class pdbDataset(data.Dataset):
+    """
+    For loading batches of data from pdb files.
+    """
+
+    def __init__(
+        self: pdbDataset,
+        folder: str,
+    ) -> None:
+
+        # Get the paths of all the files in the data folder
+        self.paths = []
+        for file in os.listdir(folder):
+            if file.endswith('pdb'):
+                self.paths.append(folder + '/' + file)
+
+    def __getitem__(
+        self: pdbDataset,
+        ix: int,
+    ) -> tuple[torch.Tensor]:
+        """
+        Get the data from the .pdb file at index ix.
+        """
+
+        # Get the path that this index corresponds to
+        path = self.paths[ix]
+        # Parse bond tensors
+        U, V = parse_pdb(path)
+        # Graph bonds as edges
+        graph = dgl.graph((U,V))
+        # Add self <-> self bonds to the graph
+        graph = dgl.add_self_loop(graph)
+        return graph
+        
+    
 #dataset = QM9Dataset('QM9_data')
 #coordinates, elements, energy = dataset[0]
 #print(coordinates, elements, energy, len(dataset))
