@@ -139,7 +139,11 @@ class pdbDataset(data.Dataset):
         graph = dgl.graph((U,V))
         # Add self <-> self bonds to the graph
         graph = dgl.add_self_loop(graph)
-        return graph, coordinates
+        # convert the elements into integers
+        elements = [ELEMENT_IX[element] for element in elements]
+        # Convert the elements to a PyTorch tensor
+        elements = torch.tensor(elements)
+        return graph, coordinates, elements
         
     
 dataset = pdbDataset('pdb_data')

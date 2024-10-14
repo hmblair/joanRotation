@@ -64,4 +64,5 @@ def parse_pdb(filename: str) -> torch.Tensor:
         V = torch.cat((bond_destination,bond_origin))
         coordinates = pdb.coord
         coordinates = torch.tensor(coordinates)
-        return U, V, coordinates
+        elements = pdb.element
+        return U, V, coordinates, elements
