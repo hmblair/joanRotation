@@ -54,7 +54,7 @@ def parse_pdb(filename: str) -> torch.Tensor:
     """
     with open(filename, 'r') as f:
         pdb = load_structure(f)
-        bond_list = biotite.structure.connect_via_distances(pdb)
+        bond_list = biotite.structure.connect_via_residue_names(pdb)
         bond_array = bond_list.as_array()
         bond_array = bond_array.astype(np.int64)
         bond_tensor = torch.from_numpy(bond_array)
