@@ -12,6 +12,7 @@ from biotite.structure.io import load_structure
 import biotite
 import torch
 import dgl
+import xarray as xr
 
 ELEMENT_IX = {
     "H": 1,
@@ -107,13 +108,13 @@ class QM9Dataset(data.Dataset):
         """
         return random.shuffle(self.paths)
  
-class cifDataset(data.Dataset):
+class CifDataset(data.Dataset):
     """
     For loading batches of data from cif files.
     """
 
     def __init__(
-        self: cifDataset,
+        self: CifDataset,
         folder: str,
     ) -> None:
 
@@ -124,7 +125,7 @@ class cifDataset(data.Dataset):
                 self.paths.append(folder + '/' + file)
 
     def __getitem__(
-        self: cifDataset,
+        self: CifDataset,
         ix: int,
     ) -> tuple[torch.Tensor]:
         """
@@ -145,8 +146,31 @@ class cifDataset(data.Dataset):
         elements = torch.tensor(elements)
         return graph, coordinates, elements
         
-    
-dataset = cifDataset('pdb_data')
-print(dataset)
+class EnergyDataset(data.Dataset):
+    """
+    For loading batches of data from the QM9 dataset.
+    """
+
+    def __init__(
+        self: EnergyDataset,
+        file: str,
+    ) -> None:
+   
+        self.energy_file = xr.load_dataset(file)   
+    def __getitem__(
+        self: EnergyDataset,
+        ix: int
+    ):
+        energy = self.energy_file['energy'].values[ix] 
+        return energy
+
+    def __len__(
+        self: EnergyDataset
+):
+        return self.energy_file.sizes["molecule"]
+
+dataset = EnergyDataset('energy.nc')
+print(len(dataset))
+print(dataset[5])
 #coordinates, elements, energy = dataset[0]
 #print(coordinates, elements, energy, len(dataset))
