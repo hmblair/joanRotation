@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 from parse import parse_xyz
-from parse import parse_pdb
+from parse import parse_cif
 import torch
 from torch.utils import data
 import os
@@ -107,34 +107,34 @@ class QM9Dataset(data.Dataset):
         """
         return random.shuffle(self.paths)
  
-class pdbDataset(data.Dataset):
+class cifDataset(data.Dataset):
     """
-    For loading batches of data from pdb files.
+    For loading batches of data from cif files.
     """
 
     def __init__(
-        self: pdbDataset,
+        self: cifDataset,
         folder: str,
     ) -> None:
 
         # Get the paths of all the files in the data folder
         self.paths = []
         for file in os.listdir(folder):
-            if file.endswith('pdb'):
+            if file.endswith('bcif'):
                 self.paths.append(folder + '/' + file)
 
     def __getitem__(
-        self: pdbDataset,
+        self: cifDataset,
         ix: int,
     ) -> tuple[torch.Tensor]:
         """
-        Get the data from the .pdb file at index ix.
+        Get the data from the .bcif file at index ix.
         """
 
         # Get the path that this index corresponds to
         path = self.paths[ix]
         # Parse bond tensors and coordinates
-        U, V, coordinates = parse_pdb(path)
+        U, V, coordinates = parse_cif(path)
         # Graph bonds as edges
         graph = dgl.graph((U,V))
         # Add self <-> self bonds to the graph
@@ -146,7 +146,7 @@ class pdbDataset(data.Dataset):
         return graph, coordinates, elements
         
     
-dataset = pdbDataset('pdb_data')
+dataset = cifDataset('pdb_data')
 print(dataset)
 #coordinates, elements, energy = dataset[0]
 #print(coordinates, elements, energy, len(dataset))

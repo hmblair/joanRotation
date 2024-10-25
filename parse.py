@@ -47,14 +47,14 @@ def parse_xyz(filename: str) -> tuple[np.ndarray, list[str], float]:
 
     return coordinates, elements, energy, charges
 
-def parse_pdb(filename: str) -> torch.Tensor:
+def parse_cif(filename: str) -> torch.Tensor:
     """
-    Parses bond_list from pdb files. 
+    Parses bond_list from cif files. 
     Creates 2 tensors: origin -> destination and destination -> origin (covers both directions)
     """
     with open(filename, 'r') as f:
-        pdb = load_structure(f)
-        bond_list = biotite.structure.connect_via_residue_names(pdb)
+        cif = load_structure(f)
+        bond_list = biotite.structure.connect_via_residue_names(cif)
         bond_array = bond_list.as_array()
         bond_array = bond_array.astype(np.int64)
         bond_tensor = torch.from_numpy(bond_array)
